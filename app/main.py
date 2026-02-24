@@ -1,9 +1,8 @@
 import os
-import json
 import numpy as np
 import tensorflow as tf
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -34,40 +33,58 @@ class TicketRequest(BaseModel):
     text: str
 
 
-print("Loading model...")
+MODEL = None
+TOKENIZER = None
+CLEANER = None
+LABELS = None
+EXPLAINER = None
 
-model = tf.keras.models.load_model(
-    os.path.join(CONFIG["model_dir"], "model.keras")
-)
 
-tokenizer = TextTokenizer().load()
+@app.on_event("startup")
+def load_assets():
 
-cleaner = DataCleaning()
+    global MODEL, TOKENIZER, CLEANER, LABELS, EXPLAINER
 
-labels = load_json(
-    os.path.join(CONFIG["model_dir"], "label_maps.json")
-)
+    model_path = os.path.join(CONFIG["model_dir"], "model.keras")
+    labels_path = os.path.join(CONFIG["model_dir"], "label_maps.json")
+    shap_path = os.path.join(CONFIG["shap_dir"], "shap_models.joblib")
+    tok_cfg = os.path.join(CONFIG["tokenizer_dir"], "vectorizer_config.json")
+    tok_vocab = os.path.join(CONFIG["tokenizer_dir"], "vocab.json")
 
-explainer = ShapTextExplainer().load()
+    missing = []
+    for p in [model_path, labels_path, shap_path, tok_cfg, tok_vocab]:
+        if not os.path.exists(p):
+            missing.append(p)
 
-print("Model loaded")
+    if missing:
+        raise RuntimeError("Missing artifacts: " + " | ".join(missing))
+
+    MODEL = tf.keras.models.load_model(model_path)
+    TOKENIZER = TextTokenizer().load()
+    CLEANER = DataCleaning()
+    LABELS = load_json(labels_path)
+    EXPLAINER = ShapTextExplainer().load()
+
+
+def ensure_loaded():
+    if MODEL is None or TOKENIZER is None or CLEANER is None or LABELS is None or EXPLAINER is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
 
 
 def predict_text(text):
 
-    clean = cleaner.clean(text)
+    ensure_loaded()
 
-    X = tokenizer.transform([clean])
+    clean = CLEANER.clean(text)
+    X = TOKENIZER.transform([clean])
 
-    p_cat, p_pri, p_sent = model.predict(X, verbose=0)
+    p_cat, p_pri, p_sent = MODEL.predict(X, verbose=0)
 
-    preds = {
-        "category": labels["category"][int(np.argmax(p_cat))],
-        "priority": labels["priority"][int(np.argmax(p_pri))],
-        "sentiment": labels["sentiment"][int(np.argmax(p_sent))]
+    return {
+        "category": LABELS["category"][int(np.argmax(p_cat))],
+        "priority": LABELS["priority"][int(np.argmax(p_pri))],
+        "sentiment": LABELS["sentiment"][int(np.argmax(p_sent))]
     }
-
-    return preds
 
 
 def suggest_reply(preds):
@@ -92,25 +109,27 @@ def suggest_reply(preds):
 
 @app.get("/")
 def frontend():
-    return FileResponse(FRONTEND_PATH)
+    if os.path.exists(FRONTEND_PATH):
+        return FileResponse(FRONTEND_PATH)
+    return {"status": "running", "note": "frontend/index.html not found"}
 
 
 @app.get("/health")
 def health():
-    return {"status": "running"}
+    loaded = MODEL is not None
+    return {"status": "running", "model_loaded": loaded}
 
 
 @app.post("/predict")
 def predict(req: TicketRequest):
 
     preds = predict_text(req.text)
-
     preds["reply"] = suggest_reply(preds)
-
     return preds
 
 
 @app.post("/explain")
 def explain(req: TicketRequest):
 
-    return explainer.explain(req.text)
+    ensure_loaded()
+    return EXPLAINER.explain(req.text)
