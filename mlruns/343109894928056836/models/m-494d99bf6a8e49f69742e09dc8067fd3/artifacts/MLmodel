@@ -1,0 +1,22 @@
+artifact_path: file:///C:/Users/dhima/OneDrive/Desktop/dl_project/mlruns/343109894928056836/models/m-494d99bf6a8e49f69742e09dc8067fd3/artifacts
+flavors:
+  python_function:
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.tensorflow
+    python_version: 3.11.9
+  tensorflow:
+    code: null
+    data: data
+    keras_version: 2.20.0
+    model_type: keras
+    save_format: tf
+mlflow_version: 3.9.0
+model_id: m-494d99bf6a8e49f69742e09dc8067fd3
+model_size_bytes: 32182876
+model_uuid: m-494d99bf6a8e49f69742e09dc8067fd3
+prompts: null
+run_id: ab00681faad441a199d91e402a6d44b2
+utc_time_created: '2026-02-23 18:21:48.643746'

@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Support Desk</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#0f1733;
+      --card2:#0d1430;
+      --muted:#93a4c7;
+      --text:#eaf0ff;
+      --line:rgba(255,255,255,.08);
+      --glow:rgba(120,160,255,.12);
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --accent:#7aa7ff;
+      --accent2:#a78bfa;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 18% 18%, rgba(122,167,255,.18), transparent 60%),
+        radial-gradient(900px 520px at 82% 22%, rgba(167,139,250,.15), transparent 62%),
+        radial-gradient(900px 520px at 50% 86%, rgba(52,211,153,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg), #070a14 65%, #060812);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1200px;margin:0 auto;padding:26px 18px 42px}
+    header{
+      display:flex;gap:14px;align-items:center;justify-content:space-between;
+      position:sticky;top:0;backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(11,16,32,.86), rgba(11,16,32,.60));
+      border-bottom:1px solid var(--line);
+      padding:14px 18px;margin:-26px -18px 20px;
+      z-index:10;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      letter-spacing:.2px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(122,167,255,.95), rgba(167,139,250,.95));
+      box-shadow: 0 14px 40px rgba(122,167,255,.18);
+      position:relative;overflow:hidden;
+    }
+    .logo:after{
+      content:"";position:absolute;inset:-60%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.45), transparent 55%);
+      transform: rotate(18deg);
+    }
+    .brand h1{
+      margin:0;font-size:15px;font-weight:800;
+    }
+    .brand p{margin:0;color:var(--muted);font-size:12px}
+    .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      display:flex;align-items:center;gap:8px;
+      padding:9px 12px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(15,23,51,.65);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      user-select:none;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:99px;background:var(--warn);
+      box-shadow: 0 0 0 6px rgba(251,191,36,.10);
+    }
+    .dot.ok{background:var(--good);box-shadow:0 0 0 6px rgba(52,211,153,.10)}
+    .dot.bad{background:var(--bad);box-shadow:0 0 0 6px rgba(251,113,133,.10)}
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(15,23,51,.65);
+      color:var(--text);
+      padding:10px 12px;border-radius:12px;
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      display:inline-flex;align-items:center;gap:8px;
+      font-weight:700;font-size:13px;
+    }
+    .btn:hover{background: rgba(15,23,51,.85);border-color: rgba(255,255,255,.14)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(122,167,255,.95), rgba(167,139,250,.95));
+      border-color: rgba(255,255,255,.10);
+      color:#071026;
+      box-shadow: 0 14px 40px rgba(122,167,255,.16);
+    }
+    .btn.primary:hover{filter: brightness(1.05)}
+    .btn.ghost{
+      background: transparent;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(15,23,51,.72), rgba(15,23,51,.45));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--line);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      background: radial-gradient(520px 170px at 20% 20%, var(--glow), transparent 62%);
+    }
+    .head h2{
+      margin:0;font-size:14px;font-weight:900;letter-spacing:.2px
+    }
+    .head .sub{margin-top:4px;color:var(--muted);font-size:12px}
+    .card .body{padding:14px 16px 16px}
+    .tabs{
+      display:flex;gap:8px;flex-wrap:wrap;
+    }
+    .tab{
+      padding:10px 12px;border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(13,20,48,.55);
+      cursor:pointer;
+      transition: background .2s ease, transform .08s ease, border-color .2s ease;
+      font-weight:800;font-size:13px;
+      display:flex;align-items:center;gap:8px;
+      user-select:none;
+    }
+    .tab:hover{background: rgba(13,20,48,.78);border-color: rgba(255,255,255,.14)}
+    .tab:active{transform: translateY(1px)}
+    .tab.active{
+      background: linear-gradient(135deg, rgba(122,167,255,.22), rgba(167,139,250,.18));
+      border-color: rgba(122,167,255,.40);
+    }
+    .icon{
+      width:18px;height:18px;border-radius:6px;
+      background: rgba(255,255,255,.07);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:12px;
+    }
+
+    .field{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    label{font-size:12px;color:var(--muted);font-weight:700}
+    textarea{
+      width:100%;
+      min-height:150px;
+      resize: vertical;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: rgba(7,10,20,.55);
+      color:var(--text);
+      padding:12px 12px;
+      outline:none;
+      font-size:14px;
+      line-height:1.35;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    textarea:focus{
+      border-color: rgba(122,167,255,.45);
+      box-shadow: 0 0 0 5px rgba(122,167,255,.10), inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .row{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      margin-top:12px;
+    }
+    .hint{font-size:12px;color:var(--muted)}
+    .kpi{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 500px){.kpi{grid-template-columns:1fr}}
+    .kpi .box{
+      padding:12px;border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(13,20,48,.55);
+    }
+    .kpi .label{font-size:11px;color:var(--muted);font-weight:800}
+    .kpi .val{margin-top:6px;font-size:16px;font-weight:950;letter-spacing:.2px}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(13,20,48,.55);
+      font-weight:900;font-size:12px;
+    }
+    .badge b{font-size:12px}
+    .pri{
+      width:10px;height:10px;border-radius:99px;background:var(--muted);
+      box-shadow: 0 0 0 6px rgba(147,164,199,.10);
+    }
+    .pri.p0{background:var(--bad);box-shadow: 0 0 0 6px rgba(251,113,133,.10)}
+    .pri.p1{background:var(--warn);box-shadow: 0 0 0 6px rgba(251,191,36,.10)}
+    .pri.p2{background:var(--accent);box-shadow: 0 0 0 6px rgba(122,167,255,.10)}
+    .pri.p3{background:var(--good);box-shadow: 0 0 0 6px rgba(52,211,153,.10)}
+    .sent{
+      width:10px;height:10px;border-radius:99px;background:var(--muted);
+      box-shadow: 0 0 0 6px rgba(147,164,199,.10);
+    }
+    .sent.negative{background:var(--bad);box-shadow: 0 0 0 6px rgba(251,113,133,.10)}
+    .sent.neutral{background:var(--warn);box-shadow: 0 0 0 6px rgba(251,191,36,.10)}
+    .sent.positive{background:var(--good);box-shadow: 0 0 0 6px rgba(52,211,153,.10)}
+
+    .section-title{
+      display:flex;align-items:center;justify-content:space-between;
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.16px;
+      text-transform: uppercase;
+    }
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(7,10,20,.50);
+      cursor:pointer;
+      transition: background .2s ease, border-color .2s ease, transform .08s ease;
+      font-weight:800;font-size:12px;color:var(--text);
+      user-select:none;
+    }
+    .chip:hover{background: rgba(7,10,20,.70);border-color: rgba(255,255,255,.14)}
+    .chip:active{transform: translateY(1px)}
+    .chip.active{
+      border-color: rgba(122,167,255,.45);
+      background: rgba(122,167,255,.12);
+    }
+
+    .result{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .reply{
+      padding:12px 12px;border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(7,10,20,.45);
+      font-size:14px;
+      line-height:1.35;
+    }
+
+    .explain{
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background: rgba(7,10,20,.35);
+    }
+    .explain .rowh{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+      font-weight:900;
+      font-size:12px;
+    }
+    .list{padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+    .item{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+    }
+    .token{
+      font-weight:900;font-size:13px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .bar{
+      height:10px;border-radius:99px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.06);
+      overflow:hidden;
+      flex:1;
+    }
+    .fill{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(122,167,255,.95), rgba(167,139,250,.95));
+      border-radius:99px;
+      transition: width .25s ease;
+    }
+    .impact{
+      font-size:12px;color:var(--muted);font-weight:800;
+      min-width:78px;text-align:right;
+    }
+
+    .toast{
+      position: fixed;
+      bottom: 18px;left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,23,51,.85);
+      border:1px solid var(--line);
+      border-radius: 999px;
+      padding:10px 14px;
+      box-shadow: var(--shadow);
+      display:none;
+      align-items:center;
+      gap:10px;
+      z-index:99;
+      backdrop-filter: blur(10px);
+      max-width:min(720px, 92vw);
+      color:var(--text);
+      font-weight:800;font-size:13px;
+    }
+    .toast.show{display:flex}
+    .spinner{
+      width:14px;height:14px;border-radius:99px;
+      border:2px solid rgba(255,255,255,.18);
+      border-top-color: rgba(255,255,255,.85);
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .small{
+      font-size:12px;color:var(--muted);font-weight:700
+    }
+    .rightcard .body{padding-top:12px}
+    .footer{
+      margin-top:18px;
+      color:rgba(147,164,199,.72);
+      font-size:12px;
+      text-align:center;
+    }
+    .split{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>Support Desk</h1>
+          <p>Submit a ticket → get instant triage + explanation</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="pill" id="statusPill">
+          <span class="dot" id="statusDot"></span>
+          <span class="small" id="statusText">Checking API…</span>
+        </div>
+        <button class="btn ghost" id="btnPing">Ping</button>
+        <button class="btn primary" id="btnPredictTop">Triage</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="head">
+          <div>
+            <h2>New Ticket</h2>
+            <div class="sub">Pick a channel, write your issue, then hit triage. You’ll get category, priority, sentiment, reply + key tokens.</div>
+          </div>
+          <span class="badge" id="activeChannelBadge"><b>Channel:</b> <span id="activeChannelText">Chat</span></span>
+        </div>
+
+        <div class="body">
+          <div class="section-title">
+            <span>Choose Channel</span>
+            <span class="small">Functional UI (actions → results)</span>
+          </div>
+
+          <div class="tabs" id="channelTabs">
+            <div class="tab active" data-channel="chat"><span class="icon">💬</span>Chat</div>
+            <div class="tab" data-channel="email"><span class="icon">✉️</span>Email</div>
+            <div class="tab" data-channel="phone"><span class="icon">📞</span>Phone</div>
+          </div>
+
+          <div class="field">
+            <label for="ticketText">Describe your issue</label>
+            <textarea id="ticketText" placeholder="Example: I was charged twice for my subscription and need a refund ASAP."></textarea>
+            <div class="split">
+              <div class="hint" id="charHint">0 chars</div>
+              <div class="chips" id="quickChips"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn ghost" id="btnClear">Clear</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end">
+              <button class="btn" id="btnExplain">Explain</button>
+              <button class="btn primary" id="btnPredict">Triage Ticket</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card rightcard">
+        <div class="head">
+          <div>
+            <h2>Live Triage Output</h2>
+            <div class="sub">Instant classification + response suggestion + explanation tokens.</div>
+          </div>
+          <span class="badge"><span class="pri p2" id="priDot"></span><span id="priText">Priority</span></span>
+        </div>
+
+        <div class="body result">
+          <div class="kpi">
+            <div class="box">
+              <div class="label">Category</div>
+              <div class="val" id="kpiCategory">—</div>
+            </div>
+            <div class="box">
+              <div class="label">Priority</div>
+              <div class="val" id="kpiPriority">—</div>
+            </div>
+            <div class="box">
+              <div class="label">Sentiment</div>
+              <div class="val" id="kpiSentiment">—</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title"><span>Suggested Reply</span><span class="small" id="replyMeta">—</span></div>
+            <div class="reply" id="replyBox">Submit a ticket to generate a suggested reply.</div>
+          </div>
+
+          <div class="explain">
+            <div class="rowh">
+              <span>Top Tokens (Explain)</span>
+              <span class="small" id="explainMeta">—</span>
+            </div>
+            <div class="list" id="explainList">
+              <div class="small">Run “Explain” or “Triage Ticket” to see token impact.</div>
+            </div>
+          </div>
+
+          <div class="footer">Base URL: <span id="baseUrlLabel"></span></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="toast" id="toast">
+      <div class="spinner" id="toastSpin"></div>
+      <div id="toastText">Working…</div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = "http://127.0.0.1:8000";
+    document.getElementById("baseUrlLabel").textContent = BASE_URL;
+
+    const els = {
+      statusDot: document.getElementById("statusDot"),
+      statusText: document.getElementById("statusText"),
+      btnPing: document.getElementById("btnPing"),
+      btnPredictTop: document.getElementById("btnPredictTop"),
+      btnPredict: document.getElementById("btnPredict"),
+      btnExplain: document.getElementById("btnExplain"),
+      btnClear: document.getElementById("btnClear"),
+      ticketText: document.getElementById("ticketText"),
+      charHint: document.getElementById("charHint"),
+      channelTabs: document.getElementById("channelTabs"),
+      activeChannelText: document.getElementById("activeChannelText"),
+      kpiCategory: document.getElementById("kpiCategory"),
+      kpiPriority: document.getElementById("kpiPriority"),
+      kpiSentiment: document.getElementById("kpiSentiment"),
+      replyBox: document.getElementById("replyBox"),
+      replyMeta: document.getElementById("replyMeta"),
+      priDot: document.getElementById("priDot"),
+      priText: document.getElementById("priText"),
+      explainList: document.getElementById("explainList"),
+      explainMeta: document.getElementById("explainMeta"),
+      toast: document.getElementById("toast"),
+      toastText: document.getElementById("toastText"),
+      toastSpin: document.getElementById("toastSpin"),
+      quickChips: document.getElementById("quickChips"),
+    };
+
+    const QUICK_TEMPLATES = {
+      billing: [
+        "I was charged twice for my subscription. Please fix it urgently.",
+        "My invoice amount is incorrect and I need clarification.",
+        "Unexpected charge on my card, please resolve ASAP."
+      ],
+      technical: [
+        "App keeps crashing when I login. This is very frustrating.",
+        "Website not loading properly and showing server error.",
+        "Unable to reset my password and access my account."
+      ],
+      delivery: [
+        "My package has not arrived yet and tracking is not updating.",
+        "Delivery is delayed and I need an update ASAP.",
+        "Received wrong product, please arrange replacement."
+      ],
+      refund: [
+        "I want a refund for my order. Please process immediately.",
+        "Refund not processed yet, when will it arrive?",
+        "Refund amount incorrect, please check."
+      ],
+      account: [
+        "Cannot login to my account, it says account locked.",
+        "Need to change email but I cannot access settings.",
+        "Forgot password and reset link is not working."
+      ],
+      general: [
+        "Do you offer discounts for annual plans?",
+        "How does this feature work? Need more information.",
+        "General inquiry about pricing and plans."
+      ]
+    };
+
+    const CHANNEL_PRESETS = {
+      chat: { tone: "short", prefix: "" },
+      email: { tone: "formal", prefix: "Hello Support Team,\n\n" },
+      phone: { tone: "urgent", prefix: "" }
+    };
+
+    let activeChannel = "chat";
+    let activeType = "refund";
+
+    function showToast(msg, loading=true){
+      els.toastText.textContent = msg;
+      els.toastSpin.style.display = loading ? "block" : "none";
+      els.toast.classList.add("show");
+    }
+    function hideToast(){
+      els.toast.classList.remove("show");
+    }
+    function setStatus(state){
+      els.statusDot.classList.remove("ok","bad");
+      if(state === "ok"){
+        els.statusDot.classList.add("ok");
+        els.statusText.textContent = "API Online";
+      } else if(state === "bad"){
+        els.statusDot.classList.add("bad");
+        els.statusText.textContent = "API Offline";
+      } else {
+        els.statusText.textContent = "Checking API…";
+      }
+    }
+
+    function setPriorityUI(priority){
+      els.priDot.className = "pri";
+      const p = (priority || "").toLowerCase();
+      if(p === "p0") els.priDot.classList.add("p0");
+      else if(p === "p1") els.priDot.classList.add("p1");
+      else if(p === "p2") els.priDot.classList.add("p2");
+      else if(p === "p3") els.priDot.classList.add("p3");
+      els.priText.textContent = priority ? `Priority ${priority}` : "Priority";
+    }
+
+    function setSentimentUI(sentiment){
+      const s = (sentiment || "").toLowerCase();
+      els.kpiSentiment.textContent = sentiment ? sentiment : "—";
+    }
+
+    function renderExplain(items){
+      els.explainList.innerHTML = "";
+      if(!items || !items.length){
+        const d = document.createElement("div");
+        d.className = "small";
+        d.textContent = "No explanation tokens returned.";
+        els.explainList.appendChild(d);
+        return;
+      }
+
+      const maxAbs = Math.max(...items.map(x => Math.abs(x.impact || 0))) || 1;
+
+      for(const it of items){
+        const row = document.createElement("div");
+        row.className = "item";
+
+        const left = document.createElement("div");
+        left.className = "token";
+
+        const t = document.createElement("span");
+        t.textContent = it.token;
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+
+        const fill = document.createElement("div");
+        fill.className = "fill";
+        const pct = Math.min(100, Math.round((Math.abs(it.impact)/maxAbs) * 100));
+        fill.style.width = pct + "%";
+
+        bar.appendChild(fill);
+        left.appendChild(t);
+        left.appendChild(bar);
+
+        const right = document.createElement("div");
+        right.className = "impact";
+        right.textContent = (it.impact >= 0 ? "+" : "") + (it.impact.toFixed ? it.impact.toFixed(4) : it.impact);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        els.explainList.appendChild(row);
+
+        requestAnimationFrame(() => fill.style.width = pct + "%");
+      }
+    }
+
+    function buildChips(){
+      els.quickChips.innerHTML = "";
+      const types = ["refund","technical","billing","delivery","account","general"];
+      for(const t of types){
+        const chip = document.createElement("div");
+        chip.className = "chip" + (t === activeType ? " active" : "");
+        chip.textContent = t.toUpperCase();
+        chip.addEventListener("click", () => {
+          activeType = t;
+          buildChips();
+          const samples = QUICK_TEMPLATES[t];
+          const pick = samples[Math.floor(Math.random() * samples.length)];
+          const prefix = CHANNEL_PRESETS[activeChannel].prefix || "";
+          els.ticketText.value = prefix + pick;
+          updateChar();
+        });
+        els.quickChips.appendChild(chip);
+      }
+    }
+
+    function updateChar(){
+      els.charHint.textContent = (els.ticketText.value || "").length + " chars";
+    }
+
+    function setChannel(ch){
+      activeChannel = ch;
+      els.activeChannelText.textContent = ch.charAt(0).toUpperCase() + ch.slice(1);
+
+      [...els.channelTabs.querySelectorAll(".tab")].forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.channel === ch);
+      });
+
+      const prefix = CHANNEL_PRESETS[ch].prefix || "";
+      const cur = (els.ticketText.value || "").trim();
+      if(prefix && !cur.startsWith(prefix.trim())){
+        els.ticketText.value = prefix + cur;
+      }
+      updateChar();
+    }
+
+    async function ping(){
+      setStatus("checking");
+      try{
+        const res = await fetch(`${BASE_URL}/`);
+        if(!res.ok) throw new Error("bad");
+        setStatus("ok");
+      } catch(e){
+        setStatus("bad");
+      }
+    }
+
+    async function postJSON(path, payload){
+      const res = await fetch(`${BASE_URL}${path}`,{
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        const t = await res.text().catch(()=>"");
+        throw new Error(`HTTP ${res.status} ${t}`);
+      }
+      return res.json();
+    }
+
+    function applyPredictUI(preds){
+      els.kpiCategory.textContent = preds.category || "—";
+      els.kpiPriority.textContent = preds.priority || "—";
+      setSentimentUI(preds.sentiment || "—");
+      setPriorityUI(preds.priority || "");
+      if(preds.reply){
+        els.replyBox.textContent = preds.reply;
+        els.replyMeta.textContent = "Generated by API";
+      }
+    }
+
+    async function triage(){
+      const text = (els.ticketText.value || "").trim();
+      if(!text){
+        showToast("Write something first.", false);
+        setTimeout(hideToast, 900);
+        return;
+      }
+
+      showToast("Triaging ticket…", true);
+
+      try{
+        const preds = await postJSON("/predict", { text });
+        applyPredictUI(preds);
+
+        els.explainMeta.textContent = "Fetching explanation…";
+        const exp = await postJSON("/explain", { text });
+        renderExplain(exp);
+        els.explainMeta.textContent = "Top tokens returned";
+
+        hideToast();
+      } catch(e){
+        showToast("API error. Check server + CORS.", false);
+        setTimeout(hideToast, 1400);
+        console.error(e);
+      }
+    }
+
+    async function explainOnly(){
+      const text = (els.ticketText.value || "").trim();
+      if(!text){
+        showToast("Write something first.", false);
+        setTimeout(hideToast, 900);
+        return;
+      }
+
+      showToast("Generating explanation…", true);
+
+      try{
+        const exp = await postJSON("/explain", { text });
+        renderExplain(exp);
+        els.explainMeta.textContent = "Top tokens returned";
+        hideToast();
+      } catch(e){
+        showToast("Explain failed. Check server.", false);
+        setTimeout(hideToast, 1400);
+        console.error(e);
+      }
+    }
+
+    function clearAll(){
+      els.ticketText.value = "";
+      updateChar();
+      els.kpiCategory.textContent = "—";
+      els.kpiPriority.textContent = "—";
+      els.kpiSentiment.textContent = "—";
+      els.replyBox.textContent = "Submit a ticket to generate a suggested reply.";
+      els.replyMeta.textContent = "—";
+      els.explainList.innerHTML = `<div class="small">Run “Explain” or “Triage Ticket” to see token impact.</div>`;
+      els.explainMeta.textContent = "—";
+      setPriorityUI("");
+    }
+
+    els.channelTabs.addEventListener("click", (e) => {
+      const tab = e.target.closest(".tab");
+      if(!tab) return;
+      setChannel(tab.dataset.channel);
+    });
+
+    els.ticketText.addEventListener("input", updateChar);
+
+    els.btnPing.addEventListener("click", ping);
+    els.btnPredict.addEventListener("click", triage);
+    els.btnPredictTop.addEventListener("click", triage);
+    els.btnExplain.addEventListener("click", explainOnly);
+    els.btnClear.addEventListener("click", clearAll);
+
+    buildChips();
+    setChannel("chat");
+    updateChar();
+    ping();
+  </script>
+</body>
+</html>

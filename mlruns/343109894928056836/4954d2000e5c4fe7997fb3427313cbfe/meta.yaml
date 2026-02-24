@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/dhima/OneDrive/Desktop/dl_project/mlruns/343109894928056836/4954d2000e5c4fe7997fb3427313cbfe/artifacts
+end_time: 1771870919820
+entry_point_name: ''
+experiment_id: '343109894928056836'
+lifecycle_stage: active
+run_id: 4954d2000e5c4fe7997fb3427313cbfe
+run_name: efficient-flea-905
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1771870915941
+status: 3
+tags: []
+user_id: dhima

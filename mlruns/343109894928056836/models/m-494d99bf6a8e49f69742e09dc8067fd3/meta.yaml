@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/dhima/OneDrive/Desktop/dl_project/mlruns/343109894928056836/models/m-494d99bf6a8e49f69742e09dc8067fd3/artifacts
+creation_timestamp: 1771870908585
+experiment_id: '343109894928056836'
+last_updated_timestamp: 1771870914751
+model_id: m-494d99bf6a8e49f69742e09dc8067fd3
+model_type: null
+name: model
+source_run_id: ab00681faad441a199d91e402a6d44b2
+status: 2
+status_message: null
