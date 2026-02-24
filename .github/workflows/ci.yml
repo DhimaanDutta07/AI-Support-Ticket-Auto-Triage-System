@@ -21,10 +21,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint
+      - name: Train
         run: |
-          ruff check .
+          python main.py
 
-      - name: Tests
+      - name: Start API
         run: |
-          pytest -q
+          nohup uvicorn app.main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
+          sleep 5
+
+      - name: Route checks
+        run: |
+          curl -f http://127.0.0.1:8000/health
+          curl -f -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json" -d '{"text":"refund not processed yet please help"}'
+          curl -f -X POST http://127.0.0.1:8000/explain -H "Content-Type: application/json" -d '{"text":"refund not processed yet please help"}'
